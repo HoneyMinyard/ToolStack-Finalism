@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Commerce Tool Stack & Architecture Blueprint</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --accent-purple: #818cf8;
+      --accent-green: #34d399;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --dropdown-bg: #0f172a;
+      --border-radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 2.5rem 1rem;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(to right, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 1.2rem;
+      background-color: var(--primary);
+      border-radius: 2px;
+    }
+
+    /* Customer Journey Diagram */
+    .pipeline-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      margin-bottom: 3rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+
+    .pipeline-step {
+      background-color: var(--dropdown-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .pipeline-step:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+    }
+
+    .step-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+      color: #0f172a;
+      font-weight: 800;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .pipeline-step h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    .pipeline-step p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Tool-Centric Stack Layout */
+    .workflow-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .tool-row {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 1.5rem;
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius);
+      padding: 1.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 868px) {
+      .tool-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .tool-header-block {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      border-right: 2px solid var(--card-border);
+      padding-right: 1.5rem;
+    }
+
+    @media (max-width: 868px) {
+      .tool-header-block {
+        border-right: none;
+        border-bottom: 2px solid var(--card-border);
+        padding-right: 0;
+        padding-bottom: 1.25rem;
+      }
+    }
+
+    .tool-num {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-purple);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.2rem;
+    }
+
+    .tool-main-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    .process-sub-badge {
+      display: inline-block;
+      align-self: flex-start;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 6px;
+      background-color: rgba(129, 140, 248, 0.15);
+      color: var(--accent-purple);
+      border: 1px solid rgba(129, 140, 248, 0.3);
+      margin-bottom: 0.75rem;
+    }
+
+    .details-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    details {
+      background-color: var(--dropdown-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    details[open] {
+      border-color: var(--primary);
+    }
+
+    summary {
+      padding: 1rem 1.25rem;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-main);
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    summary:hover {
+      background-color: rgba(56, 189, 248, 0.05);
+      color: var(--primary);
+    }
+
+    summary::after {
+      content: '►';
+      font-size: 0.75rem;
+      transition: transform 0.2s ease;
+      color: var(--text-muted);
+    }
+
+    details[open] summary::after {
+      transform: rotate(90deg);
+      color: var(--primary);
+    }
+
+    .tool-content {
+      padding: 1.25rem;
+      border-top: 1px solid var(--card-border);
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    .tool-content ul {
+      margin-left: 1.25rem;
+    }
+
+    .tool-content li {
+      margin-bottom: 0.6rem;
+      line-height: 1.5;
+    }
+
+    .tool-content li:last-child {
+      margin-bottom: 0;
+    }
+
+    .highlight-note {
+      background-color: rgba(129, 140, 248, 0.1);
+      border-left: 3px solid var(--accent-purple);
+      padding: 0.75rem 1rem;
+      border-radius: 0 6px 6px 0;
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      color: #c7d2fe;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>E-Commerce Store Tool Stack</h1>
+      <p>Tool Priorities & Actionable Deliverables Guide</p>
+    </header>
+
+    <!-- Visual Customer Order Journey -->
+    <div class="pipeline-card">
+      <div class="section-title">Customer Order Journey</div>
+      <div class="pipeline-grid">
+
+        <div class="pipeline-step">
+          <div class="step-badge">1</div>
+          <h4>Browse Catalog</h4>
+          <p>Customer views live items dynamic from Google Sheets on static site.</p>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="step-badge">2</div>
+          <h4>Build Cart</h4>
+          <p>Customer selects variations & adds items to local browser cart.</p>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="step-badge">3</div>
+          <h4>Submit Request</h4>
+          <p>Customer enters details in modal & clicks "Submit Order Request".</p>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="step-badge">4</div>
+          <h4>Auto Stock Reserve</h4>
+          <p>Apps Script checks availability & locks stock to "Reserved" on Sheets.</p>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="step-badge">5</div>
+          <h4>Email Summary</h4>
+          <p>System sends clean order breakdown (no QR code) to customer & seller.</p>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="step-badge">6</div>
+          <h4>DM & Payment</h4>
+          <p>Customer sends Ref # in DMs; seller approves & provides payment QR.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sequential Tool Stack & Objectives -->
+    <div class="section-title">Tool Stack Deliverables & Objectives</div>
+    <div class="workflow-grid">
+
+      <!-- Tool 1 -->
+      <div class="tool-row">
+        <div class="tool-header-block">
+          <span class="tool-num">Tool 01</span>
+          <h2 class="tool-main-name">ChatGPT</h2>
+          <span class="process-sub-badge">AI Development & Code Generation</span>
+        </div>
+        <div class="details-container">
+          <details open>
+            <summary>What Needs to be Achieved</summary>
+            <div class="tool-content">
+              <ul>
+                <li><strong>Generate Frontend Codebase:</strong> Prompt and refine clean, responsive HTML, CSS, and JavaScript for the website and shopping cart modal.</li>
+                <li><strong>Cart Logic Development:</strong> Write JavaScript for browser storage (<code>localStorage</code>) to handle item selection, quantity adjustments, and cart totals.</li>
+                <li><strong>Backend Integration Snippets:</strong> Draft Google Apps Script functions to connect the website frontend to Google Sheets via API calls.</li>
+                <li><strong>Responsive Styling:</strong> Design CSS layouts tailored for both mobile devices and desktop views.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Tool 2 -->
+      <div class="tool-row">
+        <div class="tool-header-block">
+          <span class="tool-num">Tool 02</span>
+          <h2 class="tool-main-name">GitHub</h2>
+          <span class="process-sub-badge">Code Repository & Asset Storage</span>
+        </div>
+        <div class="details-container">
+          <details open>
+            <summary>What Needs to be Achieved</summary>
+            <div class="tool-content">
+              <ul>
+                <li><strong>Repository Architecture:</strong> Initialize the repository with <code>main</code> (production build) and <code>dev</code> (testing/staging) branches.</li>
+                <li><strong>Image Asset Storage:</strong> Create an <code>assets/images/</code> directory to store and serve raw, high-resolution product photos.</li>
+                <li><strong>Version Control:</strong> Test code updates safely in <code>dev</code> before merging changes into <code>main</code>.</li>
+                <li><strong>Direct Image Linking:</strong> Serve direct raw content URLs to populate product photos in the Master Google Sheet catalog.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Tool 3 -->
+      <div class="tool-row">
+        <div class="tool-header-block">
+          <span class="tool-num">Tool 03</span>
+          <h2 class="tool-main-name">Cloudflare Pages</h2>
+          <span class="process-sub-badge">Hosting & Continuous Deployment</span>
+        </div>
+        <div class="details-container">
+          <details open>
+            <summary>What Needs to be Achieved</summary>
+            <div class="tool-content">
+              <ul>
+                <li><strong>GitHub Integration:</strong> Connect the repository’s <code>main</code> branch directly to Cloudflare Pages.</li>
+                <li><strong>Automated Builds:</strong> Enable continuous deployment to automatically rebuild the live site whenever changes are merged into <code>main</code>.</li>
+                <li><strong>Domain & Security Setup:</strong> Secure the live site on HTTPS with a custom <code>*.pages.dev</code> domain.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Tool 4 -->
+      <div class="tool-row">
+        <div class="tool-header-block">
+          <span class="tool-num">Tool 04</span>
+          <h2 class="tool-main-name">Google Sheets</h2>
+          <span class="process-sub-badge">Master Inventory & Database</span>
+        </div>
+        <div class="details-container">
+          <details open>
+            <summary>What Needs to be Achieved</summary>
+            <div class="tool-content">
+              <ul>
+                <li><strong>Master Inventory Schema:</strong> Set up product tables with distinct columns for Product ID, Title, Category, Price, Direct Image URL, and Stock Availability.</li>
+                <li><strong>Order Log Schema:</strong> Build an automated Order Requests tab logging Timestamp, Order Reference #, Customer Details, Ordered Items, Total Cost, and Status.</li>
+                <li><strong>Formula Sanitization:</strong> Keep inventory data columns free of cell formulas so Google Apps Script queries parse clean data.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Tool 5 -->
+      <div class="tool-row">
+        <div class="tool-header-block">
+          <span class="tool-num">Tool 05</span>
+          <h2 class="tool-main-name">Google Apps Script</h2>
+          <span class="process-sub-badge">Backend API & Automation Engine</span>
+        </div>
+        <div class="details-container">
+          <details open>
+            <summary>What Needs to be Achieved</summary>
+            <div class="tool-content">
+              <ul>
+                <li><strong>Web App API Deployment:</strong> Deploy a Web App endpoint script to receive POST request payloads from the site checkout modal.</li>
+                <li><strong>Real-Time Inventory Audit:</strong> Check item availability in Google Sheets before accepting an order request.</li>
+                <li><strong>Automated Stock Locking:</strong> Automatically switch item status to "Reserved" on the spreadsheet upon successful submission.</li>
+                <li><strong>Email Notification Dispatch:</strong> Trigger automated order summary emails (containing line items, total fees, and reference numbers) to both customer and seller without attaching payment details.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Tool 6 -->
+      <div class="tool-row">
+        <div class="tool-header-block">
+          <span class="tool-num">Tool 06</span>
+          <h2 class="tool-main-name">Custom Frontend</h2>
+          <span class="process-sub-badge">Catalogue + Cart Interface</span>
+        </div>
+        <div class="details-container">
+          <details open>
+            <summary>What Needs to be Achieved</summary>
+            <div class="tool-content">
+              <ul>
+                <li><strong>Dynamic Catalog Rendering:</strong> Fetch real-time product lists from Google Sheets to render available catalog items dynamically.</li>
+                <li><strong>Cart Management:</strong> Provide an intuitive shopping cart modal using <code>localStorage</code> to retain items during browser sessions.</li>
+                <li><strong>Customer Info Capture:</strong> Collect required buyer information (Name, Shipping Address, Regional Destination, Instagram Handle) at checkout.</li>
+                <li><strong>Payload Dispatch:</strong> Format cart details into a JSON payload and post it to the Google Apps Script endpoint.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Tool 7 -->
+      <div class="tool-row">
+        <div class="tool-header-block">
+          <span class="tool-num">Tool 07</span>
+          <h2 class="tool-main-name">Instagram DMs</h2>
+          <span class="process-sub-badge">Order Verification & Customer Hub</span>
+        </div>
+        <div class="details-container">
+          <details open>
+            <summary>What Needs to be Achieved</summary>
+            <div class="tool-content">
+              <ul>
+                <li><strong>Reference Cross-Checking:</strong> Receive customer order reference numbers in DMs and match them against logged Google Sheets entries.</li>
+                <li><strong>Manual Order Review:</strong> Audit reserved items, delivery region, and shipping fees before approving the transaction.</li>
+                <li><strong>Payment Dispatch:</strong> Send GCash / Bank Transfer QR codes directly in DM conversations once the order is verified.</li>
+                <li><strong>Status Updates:</strong> Mark orders as "Paid / Processing" in Google Sheets and notify customers on fulfillment progress.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Tool 8 -->
+      <div class="tool-row">
+        <div class="tool-header-block">
+          <span class="tool-num">Tool 08</span>
+          <h2 class="tool-main-name">GCash & Bank Transfer</h2>
+          <span class="process-sub-badge">Payment Processing</span>
+        </div>
+        <div class="details-container">
+          <details open>
+            <summary>What Needs to be Achieved</summary>
+            <div class="tool-content">
+              <ul>
+                <li><strong>QR Asset Preparation:</strong> Generate official GCash and Instapay/Bank Transfer QR codes.</li>
+                <li><strong>Payment Verification:</strong> Verify incoming transaction receipts submitted by buyers in Instagram DMs against account records.</li>
+                <li><strong>Reconciliation:</strong> Match confirmed transactions with corresponding invoice amounts before dispatching packages.</li>
+              </ul>
+              <div class="highlight-note">
+                <strong>Final Step:</strong> Once payment is validated, change the sheet status from "Reserved" to "Paid / Processing" to authorize final shipping.
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
